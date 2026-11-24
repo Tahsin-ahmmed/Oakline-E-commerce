@@ -15,7 +15,7 @@ const schema = z.object({
   CLOUDINARY_CLOUD_NAME: optional,
   CLOUDINARY_API_KEY: optional,
   CLOUDINARY_API_SECRET: optional,
-  CLOUDINARY_UPLOAD_FOLDER: z.string().default("oakline"),
+  CLOUDINARY_UPLOAD_FOLDER: z.string().default("ezyza"),
   STRIPE_SECRET_KEY: optional,
   STRIPE_WEBHOOK_SECRET: optional,
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: optional,
@@ -28,7 +28,7 @@ const schema = z.object({
     .string()
     .optional()
     .transform((v) => v === "true"),
-  EMAIL_FROM: z.string().default("Oakline <no-reply@example.com>"),
+  EMAIL_FROM: z.string().default("Ezyza <no-reply@example.com>"),
   ADMIN_NOTIFICATION_EMAIL: optional,
 });
 

@@ -223,7 +223,7 @@ export function ProductReviews({ productId, rating, reviewCount }: { productId: 
                     </p>
                     {r.adminReply && (
                       <div className="mt-4 rounded-lg bg-secondary/60 p-4 text-sm">
-                        <p className="text-xs font-semibold tracking-wide uppercase">Response from Oakline</p>
+                        <p className="text-xs font-semibold tracking-wide uppercase">Response from Ezyza</p>
                         <p className="mt-1.5 text-foreground/80">{r.adminReply}</p>
                       </div>
                     )}

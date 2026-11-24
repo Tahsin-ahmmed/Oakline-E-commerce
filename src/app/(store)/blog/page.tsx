@@ -21,7 +21,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const category = one(sp.category);
   return {
     title: "Journal",
-    description: "Stories on slow living, interiors, care guides and the makers behind our collections.",
+    description: "Style guides, care tips and the stories behind our collections.",
     alternates: { canonical: category ? `/blog?category=${category}` : "/blog" },
   };
 }
@@ -44,9 +44,9 @@ export default async function BlogIndexPage({ searchParams }: { searchParams: Pr
   return (
     <div>
       <PageIntro
-        eyebrow="The Oakline Journal"
+        eyebrow="The Ezyza Journal"
         title="Notes on living well"
-        description="Interiors, care guides and stories from the workshops we partner with."
+        description="Style guides, care tips and the stories behind our collections."
         crumbs={[{ label: "Journal" }]}
       />
       <div className="container-page">

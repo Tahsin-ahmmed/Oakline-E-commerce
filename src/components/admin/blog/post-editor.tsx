@@ -271,7 +271,7 @@ export function PostEditor({ post, categories }: { post: EditablePost | null; ca
                 />
               </div>
             </Field>
-            <Field label="Tags" htmlFor="p-tags" hint="Comma separated, e.g. interiors, care">
+            <Field label="Tags" htmlFor="p-tags" hint="Comma separated, e.g. style, care">
               <Input id="p-tags" value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
             </Field>
           </div>

@@ -91,7 +91,7 @@ test.describe("Checkout and tracking", () => {
 
   test("tracking rejects a mismatched email", async ({ page }) => {
     await page.goto("/track-order");
-    await page.getByLabel(/order number/i).fill("OAK-000000-AAAAA");
+    await page.getByLabel(/order number/i).fill("EZY-000000-AAAAA");
     await page.getByLabel("Email used at checkout").fill("someone@example.com");
     await page.getByRole("button", { name: /track/i }).click();
     await expect(page.getByText(/couldn't find an order/i)).toBeVisible();

@@ -1,4 +1,5 @@
 import "server-only";
+import { productTypesFromTree, type ProductType } from "@/lib/product-types";
 import { prisma } from "@/lib/prisma";
 import { getProductsBySource, getCategoryTree, type ProductCardDTO, type ProductSource } from "@/services/catalog";
 
@@ -28,6 +29,7 @@ export type HomeSection =
       title: string;
       subtitle: string | null;
       categories: { id: string; name: string; slug: string; imageUrl: string | null; description: string | null }[];
+      types: ProductType[];
     }
   | { key: string; type: "products"; title: string; subtitle: string | null; products: ProductCardDTO[]; href: string }
   | {
@@ -119,6 +121,7 @@ export async function getHomepage(): Promise<HomeSection[]> {
                 title: s.title,
                 subtitle: s.subtitle,
                 categories: categories.map((c) => ({ id: c.id, name: c.name, slug: c.slug, imageUrl: c.imageUrl, description: c.description })),
+                types: productTypesFromTree(tree),
               }
             : null;
         }

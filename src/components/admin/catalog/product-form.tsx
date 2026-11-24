@@ -785,7 +785,7 @@ export function ProductForm({
                 )}
               />
               <Field label="Tags" htmlFor="tags" error={err("tags")} hint="Comma separated, used in search">
-                <Input id="tags" placeholder="ceramic, gift, minimal" {...register("tags")} />
+                <Input id="tags" placeholder="leather, gift, summer" {...register("tags")} />
               </Field>
             </div>
           </Panel>

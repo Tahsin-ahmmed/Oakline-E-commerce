@@ -97,7 +97,7 @@ async function seedCatalog() {
     for (const [j, child] of c.children.entries()) {
       const sub = await prisma.category.upsert({
         where: { slug: child.slug },
-        create: { slug: child.slug, name: child.name, parentId: parent.id, sortOrder: j },
+        create: { slug: child.slug, name: child.name, parentId: parent.id, sortOrder: j, imageUrl: img(IMG[child.image], 600) },
         update: {},
       });
       categoryIds.set(child.slug, sub.id);
@@ -123,7 +123,9 @@ async function seedCatalog() {
     if (!catId) throw new Error(`Unknown category ${p.category}`);
     const code = (categoryCodes.get(p.category) ?? 0) + 1;
     categoryCodes.set(p.category, code);
-    const sku = `OAK-${p.category.slice(0, 3).toUpperCase()}-${String(index + 1).padStart(3, "0")}`;
+    // e.g. EZ-M-SUN-001 (gender · product type · sequence)
+    const [gender, type] = p.category.split("-");
+    const sku = `EZ-${gender[0].toUpperCase()}-${type.slice(0, 3).toUpperCase()}-${String(index + 1).padStart(3, "0")}`;
     const effective = resolvePrice({ price: p.price, salePrice: p.salePrice }).effective;
     const variants = p.variants ?? [{ stock: p.stock ?? 0 }];
     const hasVariants = Boolean(p.variants);
@@ -148,7 +150,7 @@ async function seedCatalog() {
         isFeatured: Boolean(p.featured),
         status: "ACTIVE",
         hasVariants,
-        seoTitle: `${p.name} | Oakline`,
+        seoTitle: `${p.name} | Ezyza`,
         seoDescription: p.short,
         publishedAt: daysAgo(Math.floor(rand() * 150)),
         createdAt: daysAgo(Math.floor(rand() * 150) + 5),
@@ -158,6 +160,9 @@ async function seedCatalog() {
         attributes: {
           create: Object.entries(p.attributes).map(([name, value]) => ({ attributeId: attributeIds.get(name)!, value })),
         },
+        extraCategories: p.alsoIn?.length
+          ? { create: p.alsoIn.map((slug) => ({ categoryId: categoryIds.get(slug)! })) }
+          : undefined,
       },
     });
 
@@ -199,32 +204,32 @@ async function seedCollections() {
   const id = (slug: string) => products.find((p) => p.slug === slug)?.id;
   const collections = [
     {
-      name: "The Slow Morning",
-      slug: "the-slow-morning",
-      description: "Mugs, candles and notebooks for unhurried starts.",
-      image: IMG.coffeeHands,
-      products: ["morning-ceramic-mug", "speckled-stoneware-cups-set-of-4", "ember-soy-candle", "linen-bound-notebook", "fountain-pen-writing-set"],
+      name: "Summer Essentials",
+      slug: "summer-essentials",
+      description: "Shades, shorts and breezy shirts for Bangladesh's hottest months.",
+      image: IMG.womanTeeShorts,
+      products: ["classic-wayfarer-sunglasses", "distressed-denim-shorts", "pique-cotton-polo", "cross-strap-platform-sandals", "loopback-sweat-shorts", "tie-dye-oversized-shirt"],
     },
     {
-      name: "Weekend Escape",
-      slug: "weekend-escape",
-      description: "Carry-alls and sun-ready accessories for getting away.",
+      name: "Office Ready",
+      slug: "office-ready",
+      description: "Crisp shirts, polished shoes and leather that means business.",
+      image: IMG.manSuit,
+      products: ["crisp-white-formal-shirt", "oxford-button-down-shirt", "leather-oxford-brogues", "full-grain-leather-belt", "pastel-poplin-shirt", "teal-satchel-bag"],
+    },
+    {
+      name: "Weekend Getaway",
+      slug: "weekend-getaway",
+      description: "Carry-alls and easy pieces for trips to Cox's Bazar and beyond.",
       image: IMG.bagWicker,
-      products: ["wicker-weekend-basket", "round-gold-sunglasses", "washed-cotton-cap", "market-tote", "everyday-commuter-backpack"],
-    },
-    {
-      name: "Warm Minimal Living",
-      slug: "warm-minimal-living",
-      description: "Lighting, textiles and objects in earthy, quiet tones.",
-      image: IMG.livingTan,
-      products: ["arc-steel-floor-lamp", "alder-stoneware-vase", "linen-lumbar-cushion", "teak-drum-side-table", "rattan-sun-mirror"],
+      products: ["wicker-basket-bag", "everyday-commuter-backpack", "round-metal-sunglasses", "minimal-leather-sneakers", "classic-denim-shorts"],
     },
     {
       name: "Gifts Under ৳3,000",
       slug: "gifts-under-3000",
-      description: "Thoughtful presents that don't overthink the budget.",
-      image: IMG.giftKraft,
-      products: ["kraft-surprise-box", "bifold-leather-wallet", "ember-soy-candle", "botanical-face-serum", "slim-card-wallet"],
+      description: "Thoughtful presents for him and her that don't overthink the budget.",
+      image: IMG.walletHand,
+      products: ["bifold-leather-wallet", "slim-card-holder", "full-grain-leather-belt", "cat-eye-sunglasses", "compact-leather-purse", "slim-waist-belt"],
     },
   ];
   for (const [i, c] of collections.entries()) {
@@ -251,30 +256,40 @@ async function seedContent(authorId: string | null) {
     await prisma.banner.createMany({
       data: [
         {
-          title: "Made for slow living",
-          subtitle: "Natural materials, honest craft and quiet design for every room of your home.",
-          eyebrow: "New season",
-          imageUrl: img(IMG.livingBoho, 2000),
-          ctaLabel: "Shop new arrivals",
-          ctaHref: "/products?sort=newest",
+          title: "Own the everyday",
+          subtitle: "Shirts, leather and footwear for men — made to look sharp from Monday to the weekend.",
+          eyebrow: "New season · Men",
+          imageUrl: img(IMG.heroMen, 2000),
+          ctaLabel: "Shop men",
+          ctaHref: "/categories/men",
           placement: "HERO",
           sortOrder: 0,
         },
         {
-          title: "Light, reconsidered",
-          subtitle: "Sculptural lamps and pendants from Nord & Ash.",
-          eyebrow: "Lighting edit",
-          imageUrl: img(IMG.loft, 2000),
-          ctaLabel: "Explore lighting",
-          ctaHref: "/categories/lighting",
+          title: "Effortless, every day",
+          subtitle: "Statement bags, easy shirts and shoes you'll reach for again and again.",
+          eyebrow: "New season · Women",
+          imageUrl: img(IMG.heroWomen, 2000),
+          ctaLabel: "Shop women",
+          ctaHref: "/categories/women",
           placement: "HERO",
           sortOrder: 1,
         },
         {
-          title: "Up to 20% off bags & leather",
-          subtitle: "Full-grain pieces that only get better with time. Limited stock.",
-          eyebrow: "Seasonal sale",
-          imageUrl: img(IMG.sofaGreen, 1800),
+          title: "Made for the sun",
+          subtitle: "UV400 sunglasses for men and women — polarised, lightweight and built to last.",
+          eyebrow: "Sunglasses edit",
+          imageUrl: img(IMG.womanGingham, 2000),
+          ctaLabel: "Shop sunglasses",
+          ctaHref: "/products?type=sunglasses",
+          placement: "HERO",
+          sortOrder: 2,
+        },
+        {
+          title: "Up to 20% off bags, shoes & shirts",
+          subtitle: "Seasonal favourites at their best prices. Limited stock — while it lasts.",
+          eyebrow: "The sale",
+          imageUrl: img(IMG.promoShopping, 1800),
           ctaLabel: "Shop the sale",
           ctaHref: "/products?onSale=1",
           placement: "PROMO",
@@ -287,35 +302,35 @@ async function seedContent(authorId: string | null) {
   if (!(await prisma.homepageSection.count())) {
     const sections = [
       { key: "hero", type: "hero", title: "Hero banners", config: {} },
-      { key: "categories", type: "categories", title: "Shop by category", subtitle: "Everything for a considered home and everyday life.", config: { limit: 6 } },
-      { key: "trending", type: "products", title: "Trending now", subtitle: "What our community is loving this month.", config: { source: "trending", limit: 8 } },
+      { key: "categories", type: "categories", title: "Shop by department", subtitle: "Everything you need, for him and for her.", config: { limit: 2 } },
+      { key: "trending", type: "products", title: "Trending now", subtitle: "What Dhaka is wearing this month.", config: { source: "trending", limit: 8 } },
       { key: "promo", type: "promo", title: "Promotional banner", config: {} },
       { key: "best_sellers", type: "products", title: "Best sellers", subtitle: "Tried, tested and reordered.", config: { source: "best_sellers", limit: 8 } },
-      { key: "collections", type: "collections", title: "Featured collections", subtitle: "Edits curated by our studio.", config: { limit: 4 } },
-      { key: "new_arrivals", type: "products", title: "New arrivals", subtitle: "Fresh from the workshop.", config: { source: "new_arrivals", limit: 8 } },
+      { key: "collections", type: "collections", title: "Shop the edit", subtitle: "Curated looks for every plan.", config: { limit: 4 } },
+      { key: "new_arrivals", type: "products", title: "New arrivals", subtitle: "Fresh drops, just landed.", config: { source: "new_arrivals", limit: 8 } },
       {
         key: "story",
         type: "story",
-        title: "Designed in Dhaka, made to last",
+        title: "Style made easy",
         config: {
-          eyebrow: "Our story",
-          body: "Oakline began in a small studio in Gulshan with a simple belief: the objects we live with every day should be beautiful, useful and built to last. We work directly with makers across Bangladesh and beyond — potters, weavers and leatherworkers — paying fairly and choosing natural materials wherever we can.",
-          imageUrl: img(IMG.interiorDresser, 1400),
-          ctaLabel: "Read our story",
+          eyebrow: "About Ezyza",
+          body: "Ezyza started with a simple idea: looking good shouldn't be complicated. We design sunglasses, footwear, bags, leather goods and everyday clothing for men and women — pieces that work together, wear well in our climate and are priced fairly. Every order is packed in Dhaka and delivered across Bangladesh, with cash on delivery and easy 14-day returns.",
+          imageUrl: img(IMG.storeRack, 1400),
+          ctaLabel: "Our story",
           ctaHref: "/about",
         },
       },
-      { key: "testimonials", type: "testimonials", title: "Kind words", subtitle: "From customers across Bangladesh.", config: {} },
+      { key: "testimonials", type: "testimonials", title: "Loved by our customers", subtitle: "Reviews from across Bangladesh.", config: {} },
       { key: "newsletter", type: "newsletter", title: "Newsletter", config: {} },
       {
         key: "instagram",
         type: "instagram",
-        title: "@oakline.home",
-        subtitle: "Tag us to be featured.",
+        title: "@ezyza.bd",
+        subtitle: "Tag #EzyzaStyle to be featured.",
         config: {
-          handle: "oakline.home",
+          handle: "ezyza.bd",
           url: "https://instagram.com/",
-          images: [IMG.livingTan, IMG.interiorDresser, IMG.sofaGreen, IMG.livingClock, IMG.ceramicCups, IMG.succulent].map((i) => img(i, 600)),
+          images: [IMG.manLeather, IMG.womanRoundSun, IMG.flatlayMen2, IMG.womanTeeShorts, IMG.manCoat, IMG.flatlayWomen].map((i) => img(i, 600)),
         },
       },
     ];
@@ -327,46 +342,46 @@ async function seedContent(authorId: string | null) {
   if (!(await prisma.testimonial.count())) {
     await prisma.testimonial.createMany({
       data: [
-        { name: "Nusrat J.", location: "Dhaka", quote: "The Alder vase is even more beautiful in person. Packaging was thoughtful and delivery took a day.", rating: 5, sortOrder: 0 },
-        { name: "Tanvir A.", location: "Chattogram", quote: "My leather backpack has been with me every day for six months and only looks better. Brilliant quality.", rating: 5, sortOrder: 1 },
-        { name: "Farhana R.", location: "Sylhet", quote: "Lovely candles and the gift wrapping made it so easy. Cash on delivery was smooth too.", rating: 4, sortOrder: 2 },
+        { name: "Nusrat J.", location: "Dhaka", quote: "The croc-embossed handbag looks far more expensive than it was. Delivered next day and the packaging was beautiful.", rating: 5, sortOrder: 0 },
+        { name: "Tanvir A.", location: "Chattogram", quote: "Bought the Oxford shirt in two colours and the leather belt. Perfect fit, great fabric — I'm ordering again.", rating: 5, sortOrder: 1 },
+        { name: "Farhana R.", location: "Sylhet", quote: "Love my cat-eye sunglasses! Cash on delivery made it easy, and exchanging a size was hassle-free.", rating: 5, sortOrder: 2 },
       ],
     });
   }
 
   if (!(await prisma.blogPost.count())) {
-    const living = await prisma.blogCategory.create({ data: { name: "Living", slug: "living" } });
-    const guides = await prisma.blogCategory.create({ data: { name: "Guides", slug: "guides" } });
+    const style = await prisma.blogCategory.create({ data: { name: "Style Guide", slug: "style-guide" } });
+    const care = await prisma.blogCategory.create({ data: { name: "Care", slug: "care" } });
     const posts = [
       {
-        title: "Five ways to make a small room feel calm",
-        slug: "five-ways-to-make-a-small-room-feel-calm",
-        excerpt: "Light, texture and restraint — simple changes that make compact spaces feel generous.",
-        categoryId: living.id,
-        cover: IMG.bedroom,
-        tags: ["interiors", "small spaces"],
+        title: "How to choose sunglasses for your face shape",
+        slug: "how-to-choose-sunglasses-for-your-face-shape",
+        excerpt: "Round, square, oval or heart — a quick guide to frames that flatter.",
+        categoryId: style.id,
+        cover: IMG.womanRoundSun,
+        tags: ["sunglasses", "style"],
         content:
-          "<p>Small rooms reward restraint. Before buying anything new, try editing what is already there: clear surfaces, group objects in odd numbers and let the walls breathe.</p><h2>1. Layer your lighting</h2><p>Replace a single ceiling light with three sources at different heights — a floor lamp, a table lamp and a candle. Warm, low light makes edges soften and rooms feel bigger.</p><h2>2. Choose a quiet palette</h2><p>Oat, chalk and clay tones reflect light and connect furniture visually. Add contrast with one darker element, like a charcoal cushion.</p><h2>3. Mirrors, placed with intent</h2><p>A round mirror opposite a window doubles the daylight. Rattan frames add texture without visual weight.</p><h2>4. Texture over pattern</h2><p>Linen, stoneware and wood bring interest without busyness.</p><h2>5. Leave one corner empty</h2><p>Negative space is a design choice. It gives the eye somewhere to rest.</p>",
+          "<p>The right pair of sunglasses balances your features. The simplest rule: choose a frame shape that contrasts with your face shape.</p><h2>Round faces</h2><p>Angular frames like wayfarers and square styles add definition. Avoid very small round frames.</p><h2>Square faces</h2><p>Soften strong jawlines with round, oval or aviator frames.</p><h2>Oval faces</h2><p>Lucky you — almost everything works. Try oversized or cat-eye frames for drama.</p><h2>Heart-shaped faces</h2><p>Frames that are wider at the bottom, like aviators or light rimless styles, balance a wider forehead.</p><h2>Always check the lens</h2><p>Look for UV400 protection — every pair at Ezyza has it — and choose polarised lenses if you drive or spend time near water.</p>",
       },
       {
-        title: "How to care for full-grain leather",
-        slug: "how-to-care-for-full-grain-leather",
-        excerpt: "A few minutes every season keeps your bag or wallet supple for decades.",
-        categoryId: guides.id,
-        cover: IMG.backpackLeather,
+        title: "How to care for leather shoes, belts and bags",
+        slug: "how-to-care-for-leather-shoes-belts-and-bags",
+        excerpt: "Five minutes a month keeps your leather looking new for years — even through monsoon.",
+        categoryId: care.id,
+        cover: IMG.oxford,
         tags: ["leather", "care"],
         content:
-          "<p>Full-grain leather is the strongest, most characterful part of the hide. Treated well, it develops a patina that tells the story of everywhere you have been.</p><h2>Clean gently</h2><p>Wipe with a soft, dry cloth after use. For marks, use a barely damp cloth and let it air dry away from direct heat.</p><h2>Condition each season</h2><p>Apply a small amount of natural leather balm with circular motions, then buff. This keeps fibres supple and resists cracking in Dhaka's dry winter.</p><h2>Store it stuffed</h2><p>Fill bags with tissue paper to keep their shape and keep them in a breathable dust bag — never plastic.</p>",
+          "<p>Good leather gets better with age — if you look after it. Here's our simple routine.</p><h2>Clean gently</h2><p>Wipe off dust with a soft, dry cloth after wearing. For marks, use a barely damp cloth and let it air-dry away from direct sun or heat.</p><h2>Condition every month</h2><p>Apply a small amount of leather balm in circular motions and buff. This keeps leather supple and stops it cracking in dry winter air.</p><h2>Monsoon tips</h2><p>If shoes get soaked, stuff them with newspaper and let them dry naturally — never on a heater. Rotate pairs so each one dries fully.</p><h2>Store it right</h2><p>Keep bags stuffed with tissue in a breathable dust bag, and hang belts or roll them loosely.</p>",
       },
       {
-        title: "The ritual of a slow morning",
-        slug: "the-ritual-of-a-slow-morning",
-        excerpt: "Why the first twenty minutes of the day deserve better than a phone screen.",
-        categoryId: living.id,
-        cover: IMG.coffeeHands,
-        tags: ["ritual", "coffee"],
+        title: "Capsule wardrobe: 10 pieces for him and her",
+        slug: "capsule-wardrobe-10-pieces-for-him-and-her",
+        excerpt: "Build a wardrobe that works harder with fewer, better pieces.",
+        categoryId: style.id,
+        cover: IMG.clothesRack,
+        tags: ["wardrobe", "style"],
         content:
-          "<p>We asked our studio team how they start the day. The answers had something in common: a warm cup, a little light and no screens for the first twenty minutes.</p><blockquote>A good mug makes coffee taste better. I don't make the rules.</blockquote><p>Try it this week: light a candle, write three lines in a notebook and drink your tea before you check your messages. Small rituals, repeated, change the shape of a day.</p>",
+          "<p>A capsule wardrobe is a small set of versatile pieces that all work together. Here's where we'd start.</p><h2>For him</h2><p>A white formal shirt, a blue Oxford, a dark polo, denim shorts, minimal white sneakers, brown brogues, a leather belt, a bifold wallet, a backpack and a classic pair of wayfarers.</p><h2>For her</h2><p>A white tee, a pastel poplin shirt, high-rise denim shorts, nude pumps, white sneakers, ankle boots, a structured top-handle bag, a slim waist belt, a compact purse and cat-eye sunglasses.</p><blockquote>Buy fewer things, choose them well, and wear them often.</blockquote><p>Start with the pieces you'll wear most this month — then build from there.</p>",
       },
     ];
     for (const [i, p] of posts.entries()) {
@@ -390,7 +405,7 @@ async function seedContent(authorId: string | null) {
   }
 
   if (!(await prisma.coupon.count())) {
-    const homeDecor = await prisma.category.findUnique({ where: { slug: "home-decor" } });
+    const footwear = await prisma.category.findMany({ where: { slug: { in: ["men-footwear", "women-footwear"] } } });
     await prisma.coupon.create({
       data: { code: "WELCOME10", description: "10% off your first order", type: "PERCENTAGE", value: 10, minPurchase: 2000, maxDiscount: 1500, perCustomerLimit: 1 },
     });
@@ -402,11 +417,11 @@ async function seedContent(authorId: string | null) {
     });
     await prisma.coupon.create({
       data: {
-        code: "HOME15",
-        description: "15% off Home Decor",
+        code: "STEP15",
+        description: "15% off all footwear",
         type: "PERCENTAGE",
         value: 15,
-        categories: homeDecor ? { connect: { id: homeDecor.id } } : undefined,
+        categories: { connect: footwear.map((c) => ({ id: c.id })) },
       },
     });
     await prisma.coupon.create({
@@ -485,7 +500,7 @@ async function seedCustomersAndOrders() {
     const totals = computeTotals({ lines: priced.map((p) => ({ unitPrice: p.unit, quantity: p.qty })), shipping });
     const paid = status === "DELIVERED";
     const ymd = placedAt.toISOString().slice(2, 10).replace(/-/g, "");
-    const orderNumber = `OAK-${ymd}-${String(1000 + n)}`;
+    const orderNumber = `EZY-${ymd}-${String(1000 + n)}`;
     const flow: OrderStatus[] = ["PENDING", "CONFIRMED", "PROCESSING", "PACKED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED"];
     const history: OrderStatus[] =
       status === "CANCELLED" ? ["PENDING", "CANCELLED"] : flow.slice(0, flow.indexOf(status) + 1);
@@ -620,11 +635,11 @@ async function seedCustomersAndOrders() {
       name: "Shirin Akter",
       email: "shirin@example.com",
       subject: "Bulk order for corporate gifts",
-      message: "Hello! We'd like 40 Celebration Gift Boxes for our office in December. Do you offer corporate pricing?",
+      message: "Hello! We would like 40 leather wallets and belts as staff gifts in December. Do you offer corporate pricing?",
     },
   });
   await prisma.notification.create({
-    data: { audience: "ADMIN", type: "system", title: "Welcome to your Oakline dashboard", body: "Demo data has been loaded.", link: "/admin" },
+    data: { audience: "ADMIN", type: "system", title: "Welcome to your Ezyza dashboard", body: "Demo data has been loaded.", link: "/admin" },
   });
 }
 

@@ -24,7 +24,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
         }}
       >
         <div>
-          <p style={{ letterSpacing: ".2em", fontSize: 12, textTransform: "uppercase", fontFamily: "Helvetica, Arial, sans-serif" }}>Oakline</p>
+          <p style={{ letterSpacing: ".2em", fontSize: 12, textTransform: "uppercase", fontFamily: "Helvetica, Arial, sans-serif" }}>Ezyza</p>
           <h1 style={{ fontWeight: 400, fontSize: 36, margin: "16px 0" }}>Something went wrong</h1>
           <p style={{ fontFamily: "Helvetica, Arial, sans-serif", color: "#6e675e", maxWidth: 420 }}>
             An unexpected error occurred. Please try again in a moment.

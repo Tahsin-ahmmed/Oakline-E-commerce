@@ -1,6 +1,6 @@
-# Oakline — Lifestyle E-Commerce Platform
+# Ezyza — Fashion & Accessories E-Commerce Platform
 
-A full-stack, production-oriented lifestyle store (home decor, kitchen & dining, bags, watches, accessories, personal care, gifts) with a customer storefront, customer accounts, transactional checkout, and a role-based admin dashboard. Built for a Bangladesh-first deployment (BDT, divisions/districts shipping zones, Cash on Delivery) with Stripe card payments and an adapter layer for bKash, Nagad and SSLCommerz.
+A full-stack, production-oriented fashion store selling sunglasses, footwear, bags, belts, wallets, shirts, shorts and underwear for men and women, with a customer storefront, customer accounts, transactional checkout, and a role-based admin dashboard. Built for a Bangladesh-first deployment (BDT, divisions/districts shipping zones, Cash on Delivery) with Stripe card payments and an adapter layer for bKash, Nagad and SSLCommerz.
 
 ---
 
@@ -152,7 +152,7 @@ npm run db:studio      # browse data
 
 Prisma 7 reads its connection from [`prisma.config.ts`](prisma.config.ts) (which loads `.env`), not from `schema.prisma`.
 
-**Demo content** (skipped with `SEED_DEMO=false`): 10 categories with subcategories, 8 brands, 49 products (with colour/size variants, sale prices, featured items and some low/out-of-stock items), shipping zones for Dhaka / suburbs / rest of Bangladesh, 5 coupons (`WELCOME10`, `FLAT500`, `FREESHIP`, `HOME15`, and the expired `SUMMER20`), banners, homepage sections, collections, testimonials, 3 blog posts, 6 demo customers, 42 historical COD orders across ~4 months (so the dashboard charts have real data) and verified-purchase reviews.
+**Demo content** (skipped with `SEED_DEMO=false`): two departments (Men, Women) with 8 subcategories each (Sunglasses, Footwear, Bags, Belts, Wallets, Shirts, Shorts, Underwear), 6 house brands, ~50 products with size/colour variants, sale prices, featured items and some low/out-of-stock sizes, shipping zones for Dhaka / suburbs / rest of Bangladesh, 5 coupons (`WELCOME10`, `FLAT500`, `FREESHIP`, `STEP15` on footwear, and the expired `SUMMER20`), banners, homepage sections, collections, testimonials, 3 blog posts, 6 demo customers, 42 historical COD orders across ~4 months (so the dashboard charts have real data) and verified-purchase reviews.
 
 Demo customers (skip them with `SEED_DEMO_CUSTOMERS=false`; e.g. `ayesha@example.com`) use the password `Customer#2026`. They exist only when demo data is seeded — **never seed demo data in production** (`SEED_DEMO=false`).
 

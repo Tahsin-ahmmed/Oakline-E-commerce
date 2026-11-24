@@ -36,38 +36,61 @@ export function SectionHeading({
 }
 
 export function CategoriesSection({ section }: { section: Of<"categories"> }) {
+  const departments = section.categories;
+  const twoUp = departments.length <= 2;
   return (
     <section className="container-page py-20">
       <SectionHeading title={section.title} subtitle={section.subtitle} href="/products" linkLabel="Shop everything" />
-      <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3">
-        {section.categories.map((c, i) => (
+      <div className={twoUp ? "grid gap-4 sm:grid-cols-2 sm:gap-6" : "grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3"}>
+        {departments.map((c, i) => (
           <Link
             key={c.id}
             href={`/categories/${c.slug}`}
-            className={`group relative overflow-hidden rounded-lg bg-muted ${i === 0 ? "row-span-2 aspect-[4/5] lg:aspect-auto" : "aspect-[4/3]"}`}
+            className={`group relative overflow-hidden rounded-lg bg-muted ${
+              twoUp ? "aspect-[4/5] sm:aspect-[3/4] lg:aspect-[4/5]" : i === 0 ? "row-span-2 aspect-[4/5] lg:aspect-auto" : "aspect-[4/3]"
+            }`}
           >
             {c.imageUrl && (
               <SmartImage
                 src={c.imageUrl}
                 alt=""
                 fill
-                sizes="(max-width:1024px) 50vw, 33vw"
+                sizes={twoUp ? "(max-width:640px) 100vw, 50vw" : "(max-width:1024px) 50vw, 33vw"}
                 className="object-cover transition duration-700 group-hover:scale-[1.04]"
               />
             )}
-            <div className="absolute inset-0 bg-black/20 transition group-hover:bg-black/30" />
-            <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5 text-white">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent transition group-hover:from-black/65" />
+            <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-6 text-white sm:p-8">
               <div>
-                <h3 className="font-heading text-xl sm:text-2xl">{c.name}</h3>
-                {c.description && i === 0 && <p className="mt-1 hidden max-w-xs text-sm text-white/85 sm:block">{c.description}</p>}
+                <p className="text-[0.7rem] font-semibold tracking-[0.25em] text-sand uppercase">Shop</p>
+                <h3 className="mt-1 font-heading text-3xl sm:text-4xl">{c.name}</h3>
+                {c.description && (twoUp || i === 0) && <p className="mt-2 hidden max-w-xs text-sm text-white/85 sm:block">{c.description}</p>}
               </div>
-              <span className="flex size-9 items-center justify-center rounded-full bg-white/90 text-primary transition group-hover:bg-white">
+              <span className="flex size-10 items-center justify-center rounded-full bg-white/90 text-primary transition group-hover:bg-sand">
                 <ArrowRight className="size-4" />
               </span>
             </div>
           </Link>
         ))}
       </div>
+
+      {section.types.length > 0 && (
+        <div className="mt-14">
+          <h3 className="eyebrow mb-5">Shop by product</h3>
+          <div className="grid grid-cols-4 gap-3 sm:gap-4 lg:grid-cols-8">
+            {section.types.map((t) => (
+              <Link key={t.slug} href={`/products?type=${t.slug}`} className="group flex flex-col items-center gap-2 text-center">
+                <span className="relative block aspect-square w-full overflow-hidden rounded-full border bg-muted">
+                  {t.imageUrl && (
+                    <SmartImage src={t.imageUrl} alt="" fill sizes="(max-width:1024px) 25vw, 12vw" className="object-cover transition duration-500 group-hover:scale-105" />
+                  )}
+                </span>
+                <span className="text-xs font-medium sm:text-sm">{t.name}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

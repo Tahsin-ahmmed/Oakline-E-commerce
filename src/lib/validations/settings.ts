@@ -5,11 +5,11 @@ const money = z.coerce.number().min(0).max(10_000_000);
 
 export const settingsSchemas = {
   general: z.object({
-    siteName: z.string().trim().min(1).max(80).default("Oakline"),
-    tagline: z.string().trim().max(160).default("Considered goods for everyday living"),
+    siteName: z.string().trim().min(1).max(80).default("Ezyza"),
+    tagline: z.string().trim().max(160).default("Modern essentials for men and women"),
     logoUrl: url,
     faviconUrl: url,
-    contactEmail: z.string().trim().max(120).default("hello@oakline.store"),
+    contactEmail: z.string().trim().max(120).default("hello@ezyza.com"),
     phone: z.string().trim().max(40).default("+880 1700-000000"),
     address: z.string().trim().max(300).default("House 12, Road 7, Gulshan 1, Dhaka 1212"),
     currency: z.enum(["BDT", "USD", "EUR", "GBP", "INR"]).default("BDT"),
@@ -29,7 +29,7 @@ export const settingsSchemas = {
     freeShippingThreshold: money.default(5000),
     lowStockThreshold: z.coerce.number().int().min(0).max(1000).default(5),
     codEnabled: z.boolean().default(true),
-    orderPrefix: z.string().trim().regex(/^[A-Z]{2,6}$/, "2–6 uppercase letters").default("OAK"),
+    orderPrefix: z.string().trim().regex(/^[A-Z]{2,6}$/, "2–6 uppercase letters").default("EZY"),
     returnWindowDays: z.coerce.number().int().min(0).max(365).default(14),
   }),
   policies: z.object({
@@ -37,12 +37,12 @@ export const settingsSchemas = {
     returnInfo: z.string().max(2000).default("Free returns within 14 days of delivery on unused items in original packaging."),
   }),
   seo: z.object({
-    defaultTitle: z.string().trim().max(120).default("Oakline — Considered goods for everyday living"),
+    defaultTitle: z.string().trim().max(120).default("Ezyza — Sunglasses, Footwear, Bags & Essentials for Men and Women"),
     defaultDescription: z
       .string()
       .trim()
       .max(300)
-      .default("Home decor, accessories and lifestyle essentials, thoughtfully designed and made to last."),
+      .default("Shop sunglasses, footwear, bags, belts, wallets, shirts, shorts and underwear for men and women. Cash on delivery across Bangladesh."),
     ogImageUrl: url,
   }),
   announcement: z.object({
@@ -52,12 +52,12 @@ export const settingsSchemas = {
   }),
   newsletter: z.object({
     enabled: z.boolean().default(true),
-    heading: z.string().trim().max(120).default("Letters from Oakline"),
+    heading: z.string().trim().max(120).default("Join the Ezyza list"),
     subheading: z
       .string()
       .trim()
       .max(300)
-      .default("New arrivals, slow-living notes and members-only offers. One email a fortnight, never more."),
+      .default("First access to new drops, style notes and members-only offers. No spam, ever."),
   }),
   maintenance: z.object({
     enabled: z.boolean().default(false),

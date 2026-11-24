@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryProvider } from "@/components/shared/query-provider";
@@ -7,7 +7,7 @@ import { getSettings } from "@/services/settings";
 import "./globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
-const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"], display: "swap", axes: ["opsz"] });
+const display = Playfair_Display({ variable: "--font-display", subsets: ["latin"], display: "swap" });
 
 export async function generateMetadata(): Promise<Metadata> {
   const { general, seo } = await getSettings();
@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: general.siteName,
       title: seo.defaultTitle,
       description: seo.defaultDescription,
-      images: seo.ogImageUrl ? [{ url: seo.ogImageUrl }] : undefined,
+      images: [{ url: seo.ogImageUrl || "/brand/ezyza-og.png" }],
     },
     twitter: { card: "summary_large_image" },
     alternates: { canonical: "/" },
@@ -31,14 +31,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#f7f4ef",
+  themeColor: "#0b0b0b",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang="en" className={`${inter.variable} ${display.variable}`}>
       <body className="min-h-dvh">
         <QueryProvider>
           <TooltipProvider delayDuration={200}>{children}</TooltipProvider>

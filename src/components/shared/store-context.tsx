@@ -8,7 +8,7 @@ export interface StoreContextValue {
   user: { id: string; name: string; email: string; isStaff: boolean } | null;
 }
 
-const StoreContext = createContext<StoreContextValue>({ siteName: "Oakline", currency: "BDT", user: null });
+const StoreContext = createContext<StoreContextValue>({ siteName: "Ezyza", currency: "BDT", user: null });
 
 export function StoreProvider({ value, children }: { value: StoreContextValue; children: React.ReactNode }) {
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

@@ -24,7 +24,9 @@ export default async function FaqPage() {
         { q: "How do I place an order?", a: "Add items to your bag, choose Checkout, enter your delivery details and pick a payment method. You don't need an account — but creating one lets you track orders and save addresses." },
         { q: "Can I change or cancel my order?", a: "You can cancel from your account while the order is Pending or Confirmed. Once we start preparing it, contact us as soon as possible and we'll do our best to help." },
         { q: "Will I get a confirmation?", a: "Yes. We email a confirmation with your order number straight away, and again whenever the status changes — confirmed, shipped, out for delivery and delivered." },
-        { q: "Do you offer gift wrapping?", a: "All gift sets arrive wrapped. For other items, add a note at checkout and we'll wrap them in recycled kraft paper and twine at no extra cost." },
+        { q: "How do I choose the right size?", a: "Shirts and tees come in S–XL (some styles XS). Footwear uses EU sizes — men 40–44, women 36–40 — and fits true to size. Belts and shorts are sized by waist in inches. If you're between sizes, size up for a relaxed fit or message us for advice." },
+        { q: "Can I exchange for a different size?", a: "Yes. Request a return from your order page within the return window and place a new order for the right size — we'll refund the original once it's back with us." },
+        { q: "Do you offer gift wrapping?", a: "Yes — add a note at checkout and we'll gift-wrap your order at no extra cost." },
       ],
     },
     {
@@ -54,7 +56,7 @@ export default async function FaqPage() {
         { q: "What is your return policy?", a: `You can return unused items in their original packaging within ${days} days of delivery. Request a return from your order page and we'll arrange the pickup.` },
         { q: "What if my item arrives damaged?", a: "We're so sorry! Contact us within 48 hours with a photo and we'll send a replacement or issue a full refund — no return shipping cost to you." },
         { q: "How long do refunds take?", a: "Once we receive and inspect the return, card refunds are issued within 5–7 business days. Cash on Delivery orders are refunded via bKash or bank transfer." },
-        { q: "Is anything non-returnable?", a: "For hygiene reasons opened personal care products can't be returned unless faulty. Gift cards and final-sale items are also non-returnable." },
+        { q: "Is anything non-returnable?", a: "For hygiene reasons, underwear and camisoles can't be returned once the packaging is opened (unless faulty). Gift cards and final-sale items are also non-returnable." },
       ],
     },
     {

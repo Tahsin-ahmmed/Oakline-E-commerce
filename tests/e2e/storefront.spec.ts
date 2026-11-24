@@ -10,14 +10,14 @@ test.describe("Product browsing", () => {
   });
 
   test("category listing filters and sorts real products", async ({ page }) => {
-    await page.goto("/categories/watches");
-    await expect(page.getByRole("heading", { level: 1, name: "Watches" })).toBeVisible();
+    await page.goto("/categories/men-footwear");
+    await expect(page.getByRole("heading", { level: 1, name: "Footwear" })).toBeVisible();
     const cards = page.getByTestId("product-card");
     await expect(cards.first()).toBeVisible();
     const total = await cards.count();
     expect(total).toBeGreaterThan(1);
 
-    await page.goto("/categories/watches?sort=price_asc");
+    await page.goto("/categories/men-footwear?sort=price_asc");
     const prices = await page.getByTestId("product-card").evaluateAll((els) =>
       els.map((el) => {
         const txt = el.querySelector(".tabular-nums")?.textContent ?? "0";

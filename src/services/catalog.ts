@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { discountPercent, moneyString } from "@/lib/money";
 import { resolvePrice, stockState } from "@/lib/pricing";
+import { findProductType } from "@/lib/product-types";
 
 export const CATALOG_TAG = "catalog";
 
@@ -123,6 +124,8 @@ export type SortKey = keyof typeof SORT_OPTIONS;
 export const listingFiltersSchema = z.object({
   q: z.string().trim().max(100).optional(),
   category: z.string().trim().max(100).optional(),
+  /** Cross-department product type, e.g. "sunglasses" (matches subcategories of that name under Men and Women). */
+  type: z.string().trim().max(60).optional(),
   brand: csv,
   color: csv,
   size: csv,
@@ -205,6 +208,13 @@ export async function listProducts(filters: ListingFilters) {
     base.push({ collections: { some: { collection: { slug: filters.collection, isActive: true } } } });
   }
   if (filters.tag) base.push({ tags: { has: filters.tag.toLowerCase() } });
+  let productType: { slug: string; name: string } | null = null;
+  if (filters.type) {
+    productType = findProductType(await getCategoryTree(), filters.type);
+    if (!productType) return { notFound: true as const };
+    const byName = { name: { equals: productType.name, mode: "insensitive" as const }, isActive: true };
+    base.push({ OR: [{ category: byName }, { extraCategories: { some: { category: byName } } }] });
+  }
 
   const refinements: Prisma.ProductWhereInput[] = [];
   if (filters.brand.length) refinements.push({ brand: { slug: { in: filters.brand } } });
@@ -238,6 +248,7 @@ export async function listProducts(filters: ListingFilters) {
   return {
     notFound: false as const,
     category: scope?.category ?? null,
+    productType,
     products: rows.map(toCard),
     total,
     page: filters.page,
@@ -481,7 +492,7 @@ async function loadCategoryTree() {
     slug: c.slug,
     description: c.description,
     imageUrl: c.imageUrl,
-    children: c.children.map((s) => ({ id: s.id, name: s.name, slug: s.slug })),
+    children: c.children.map((s) => ({ id: s.id, name: s.name, slug: s.slug, imageUrl: s.imageUrl })),
   }));
 }
 export type CategoryNode = Awaited<ReturnType<typeof loadCategoryTree>>[number];

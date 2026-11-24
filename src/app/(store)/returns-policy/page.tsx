@@ -79,7 +79,8 @@ export default async function ReturnsPolicyPage() {
           title: "Items we can't accept",
           body: (
             <ul>
-              <li>Opened or used personal care and skincare products (for hygiene reasons), unless faulty.</li>
+              <li>Underwear, camisoles and undershirts once the hygiene seal or packaging has been opened, unless faulty.</li>
+              <li>Sunglasses with scratched lenses, and footwear that shows signs of outdoor wear.</li>
               <li>Items marked as final sale, gift cards and personalised pieces.</li>
               <li>Items damaged through misuse, or returned without their original packaging.</li>
             </ul>

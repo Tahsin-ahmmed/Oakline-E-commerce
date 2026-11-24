@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import type { CategoryNode } from "@/services/catalog";
+import { productTypesFromTree } from "@/lib/product-types";
 import { useStore } from "@/components/shared/store-context";
 
 export function MobileNav({ categories, siteName }: { categories: CategoryNode[]; siteName: string }) {
@@ -46,6 +47,20 @@ export function MobileNav({ categories, siteName }: { categories: CategoryNode[]
                 </AccordionContent>
               </AccordionItem>
             ))}
+            {productTypesFromTree(categories).length > 0 && (
+              <AccordionItem value="__types">
+                <AccordionTrigger className="py-3.5 text-[0.95rem] font-normal hover:no-underline">Shop by product</AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid gap-1 pb-2 pl-2">
+                    {productTypesFromTree(categories).map((t) => (
+                      <Link key={t.slug} href={`/products?type=${t.slug}`} onClick={close} className="py-1.5 text-sm text-muted-foreground">
+                        {t.name}
+                      </Link>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            )}
           </Accordion>
           <Link href="/products?onSale=1" onClick={close} className="flex items-center justify-between border-b py-3.5 text-[0.95rem] text-clay">
             Sale <ChevronRight className="size-4" />

@@ -24,7 +24,7 @@ export default async function TermsPage() {
           title: "About us",
           body: (
             <p>
-              This website is operated by {name}, a lifestyle retailer based in Bangladesh{general.address ? ` (${general.address})` : ""}. You can
+              This website is operated by {name}, a fashion and accessories retailer based in Bangladesh{general.address ? ` (${general.address})` : ""}. You can
               reach us at {general.contactEmail}
               {general.phone ? ` or ${general.phone}` : ""}.
             </p>

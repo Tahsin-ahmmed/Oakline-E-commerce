@@ -1,4 +1,4 @@
-// Oakline — lifestyle e-commerce schema (PostgreSQL, Prisma 7)
+// Ezyza — fashion & accessories e-commerce schema (PostgreSQL, Prisma 7)
 // Money is always Decimal(12,2). Never use Float for currency.
 
 generator client {

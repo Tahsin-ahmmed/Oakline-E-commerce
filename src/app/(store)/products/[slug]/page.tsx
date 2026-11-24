@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = product.seoDescription ?? product.shortDescription ?? stripHtml(product.description).slice(0, 160);
   const image = product.images[0]?.url;
   return {
-    title: product.seoTitle?.replace(/\s*\|\s*Oakline$/i, "") ?? product.name,
+    title: product.seoTitle?.replace(/\s*\|\s*(Ezyza|Oakline)$/i, "") ?? product.name,
     description,
     alternates: { canonical: `/products/${product.slug}` },
     openGraph: {

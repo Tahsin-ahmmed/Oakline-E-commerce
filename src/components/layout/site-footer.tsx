@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import type { Settings } from "@/lib/validations/settings";
 import type { CategoryNode } from "@/services/catalog";
+import { productTypesFromTree } from "@/lib/product-types";
 import { Logo } from "@/components/layout/logo";
 import { NewsletterForm } from "@/components/layout/newsletter-form";
 
@@ -21,7 +22,7 @@ export function SiteFooter({ settings, categories }: { settings: Settings; categ
     <footer className="mt-24 bg-primary text-primary-foreground">
       <div className="container-page grid gap-12 py-16 lg:grid-cols-12">
         <div className="lg:col-span-4">
-          <Logo siteName={general.siteName} logoUrl={general.logoUrl || undefined} className="[&_span]:text-primary-foreground" />
+          <Logo siteName={general.siteName} tone="gold" size="lg" />
           <p className="mt-4 max-w-xs text-sm leading-6 text-primary-foreground/70">{general.tagline}</p>
           {newsletter.enabled && (
             <div className="mt-8 max-w-sm">
@@ -34,10 +35,17 @@ export function SiteFooter({ settings, categories }: { settings: Settings; categ
           <div>
             <h2 className="eyebrow !text-primary-foreground/60">Shop</h2>
             <ul className="mt-4 space-y-2.5 text-sm">
-              {categories.slice(0, 7).map((c) => (
+              {categories.slice(0, 4).map((c) => (
                 <li key={c.id}>
-                  <Link href={`/categories/${c.slug}`} className="text-primary-foreground/80 hover:text-primary-foreground">
+                  <Link href={`/categories/${c.slug}`} className="font-medium text-primary-foreground hover:text-sand">
                     {c.name}
+                  </Link>
+                </li>
+              ))}
+              {productTypesFromTree(categories).slice(0, 8).map((t) => (
+                <li key={t.slug}>
+                  <Link href={`/products?type=${t.slug}`} className="text-primary-foreground/80 hover:text-primary-foreground">
+                    {t.name}
                   </Link>
                 </li>
               ))}

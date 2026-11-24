@@ -4,16 +4,20 @@ import { getCategoryTree, listProducts, parseListingFilters } from "@/services/c
 import { ProductListing } from "@/components/catalog/product-listing";
 import { Breadcrumbs } from "@/components/catalog/breadcrumbs";
 import { toCategoryLinks, type PageSearchParams } from "@/components/catalog/category-links";
+import { findProductType } from "@/lib/product-types";
 
 type Props = { searchParams: Promise<PageSearchParams> };
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const sp = await searchParams;
-  const title = sp.onSale ? "Sale" : sp.sort === "newest" ? "New arrivals" : "Shop all";
+  const type = typeof sp.type === "string" ? findProductType(await getCategoryTree(), sp.type) : null;
+  const title = type ? `${type.name} for Men & Women` : sp.onSale ? "Sale" : sp.sort === "newest" ? "New arrivals" : "Shop all";
   return {
     title,
-    description: "Browse home decor, kitchenware, bags, watches and lifestyle essentials.",
-    alternates: { canonical: "/products" },
+    description: type
+      ? `Shop ${type.name.toLowerCase()} for men and women at Ezyza. Cash on delivery across Bangladesh.`
+      : "Shop sunglasses, footwear, bags, belts, wallets, shirts, shorts and underwear for men and women.",
+    alternates: { canonical: type ? `/products?type=${type.slug}` : "/products" },
   };
 }
 
@@ -22,10 +26,13 @@ export default async function ProductsPage({ searchParams }: Props) {
   const filters = parseListingFilters(sp);
   const [result, tree] = await Promise.all([listProducts(filters), getCategoryTree()]);
   if (result.notFound) notFound();
-  const heading = filters.onSale ? "Sale" : filters.sort === "newest" ? "New arrivals" : "Shop all";
-  const intro = filters.onSale
-    ? "Limited-time prices on pieces made to last."
-    : "Considered goods for every room and every day — designed to be used and loved for years.";
+  const type = result.productType;
+  const heading = type ? type.name : filters.onSale ? "Sale" : filters.sort === "newest" ? "New arrivals" : "Shop all";
+  const intro = type
+    ? `${type.name} for men and women — browse both edits in one place.`
+    : filters.onSale
+      ? "Limited-time prices on wardrobe favourites."
+      : "Sunglasses, footwear, bags and everyday essentials for men and women.";
 
   return (
     <div className="container-page py-10">

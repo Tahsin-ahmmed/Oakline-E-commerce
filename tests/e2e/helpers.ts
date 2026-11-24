@@ -4,7 +4,7 @@ export const ADMIN_EMAIL = process.env.E2E_ADMIN_EMAIL ?? process.env.SEED_ADMIN
 export const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? process.env.SEED_ADMIN_PASSWORD ?? "";
 
 /** A seeded, in-stock, single-variant product. */
-export const SIMPLE_PRODUCT = { slug: "alder-stoneware-vase", name: "Alder Stoneware Vase" };
+export const SIMPLE_PRODUCT = { slug: "pilot-aviator-sunglasses", name: "Pilot Aviator Sunglasses" };
 
 export function uniqueEmail(prefix: string) {
   return `${prefix}.${Date.now()}.${Math.floor(Math.random() * 1e4)}@example.com`;

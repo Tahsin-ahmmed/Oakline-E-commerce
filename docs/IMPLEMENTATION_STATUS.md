@@ -20,7 +20,7 @@ Last verified: 2026-11-24 against PostgreSQL 18, Node 24, Next.js 16.4.
 | Area | Status |
 |---|---|
 | 1. Stack: Next.js, TS, Tailwind, shadcn/ui, RHF + Zod, TanStack Query, Recharts, PostgreSQL + Prisma, Cloudinary, Stripe, COD, email | ✅ (custom DB-session auth instead of Auth.js beta — see README) |
-| 2. Brand & design system | ✅ Oakline — warm off-white, charcoal, clay/sand accents, Fraunces + Inter |
+| 2. Brand & design system | ✅ Ezyza — ivory canvas, ink black, champagne-gold accents from the logo, Playfair Display + Inter |
 | 3A. Homepage (20 elements, admin-managed sections) | ✅ |
 | 3B. Product listing (filters, sorting, pagination, quick view) | ✅ |
 | 3C. Product details (gallery + zoom, variants, stock checks, reviews, related, recently viewed) | ✅ |

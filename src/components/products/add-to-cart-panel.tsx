@@ -123,7 +123,7 @@ export function AddToCartPanel({
       {sizes.length > 0 && (
         <fieldset>
           <legend className="mb-3 text-sm">
-            {sizes.every((s) => /^\d/.test(s) || /g$|mm$/.test(s)) ? "Size" : "Option"}:{" "}
+            Size:{" "}
             <span className="font-medium">{size ?? "Select"}</span>
           </legend>
           <div className="flex flex-wrap gap-2">

@@ -13,18 +13,20 @@ test.describe("Admin", () => {
     await expect(page.getByText(/total revenue|revenue/i).first()).toBeVisible();
     await expect(page.getByText(/recent orders/i).first()).toBeVisible();
     await page.goto("/admin?range=year");
-    await expect(page.getByText(/OAK-/).first()).toBeVisible();
+    await expect(page.getByText(/EZY-/).first()).toBeVisible();
   });
 
   test("creates a product that appears on the storefront", async ({ page }) => {
-    const name = `E2E Linen Tray ${Date.now()}`;
+    const name = `E2E Leather Belt ${Date.now()}`;
     await page.goto("/admin/products/new");
     await page.locator("#name").fill(name);
     await page.locator("#sku").fill(`E2E-${Date.now()}`);
-    await page.locator("#shortDescription").fill("A woven tray created by the end-to-end suite.");
+    await page.locator("#shortDescription").fill("A belt created by the end-to-end suite.");
     await page.locator("#price").fill("1450");
     await page.locator("#simpleStock").fill("12");
-    await chooseOption(page, "Primary category", "Storage");
+    // "Belts" exists under both Men and Women — pick the first (Men › Belts).
+    await page.getByLabel(/^Primary category/).click();
+    await page.getByRole("option", { name: "Belts", exact: true }).first().click();
     await chooseOption(page, "Visibility", "Active");
     await page.getByRole("button", { name: "Create product" }).click();
     await expect(page).toHaveURL(/\/admin\/products\/(?!new)[a-z0-9]+/, { timeout: 30_000 });
@@ -47,7 +49,7 @@ test.describe("Admin", () => {
 
   test("updates an order's status and the history records it", async ({ page }) => {
     await page.goto("/admin/orders?status=PENDING");
-    const firstOrder = page.getByRole("link", { name: /^OAK-/ }).first();
+    const firstOrder = page.getByRole("link", { name: /^EZY-/ }).first();
     await expect(firstOrder).toBeVisible();
     await firstOrder.click();
     await expect(page).toHaveURL(/\/admin\/orders\/[a-z0-9]+$/);

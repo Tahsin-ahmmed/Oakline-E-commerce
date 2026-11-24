@@ -69,7 +69,7 @@ export function SearchBox() {
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
-          placeholder="Search vases, bags, watches…"
+          placeholder="Search sunglasses, sneakers, bags…"
           aria-label="Search products"
           aria-controls={listId}
           aria-expanded={showPanel}
