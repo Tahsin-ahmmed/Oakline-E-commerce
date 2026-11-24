@@ -232,7 +232,7 @@ npm run start                     # serves on PORT (default 3000)
 
 **Any Node host (VPS, Docker, Render, Railway, Fly.io):** run the commands above, put the app behind a TLS-terminating reverse proxy (nginx/Caddy) that forwards `X-Forwarded-For` / `X-Forwarded-Host`, and use a process manager (systemd/PM2). Set `NODE_ENV=production` so session cookies are `Secure`.
 
-**Vercel:** set the environment variables in the project, use a managed PostgreSQL (Neon, Supabase, RDS…), and add `npm run db:deploy` to your deploy pipeline. A pooled connection string is recommended for serverless.
+**Vercel (automatic deploys):** every push to `main` rebuilds and deploys the whole app. Set `DATABASE_URL` to the **pooled** connection string (runtime) and `DIRECT_URL` to the **direct/non-pooled** one: the build script (`scripts/migrate-on-deploy.mjs`) then applies pending Prisma migrations automatically on production deploys only (never on previews or local builds), retrying while a scale-to-zero database wakes up. If a migration fails, the build fails and the previous version stays live.
 
 Checklist: strong `AUTH_SECRET`; `AUTH_URL`/`NEXT_PUBLIC_APP_URL` set to the public HTTPS origin; Stripe webhook configured; SMTP configured; Cloudinary configured; demo data **not** seeded; database backups enabled.
 
