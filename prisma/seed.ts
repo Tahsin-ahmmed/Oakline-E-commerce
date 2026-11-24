@@ -665,8 +665,12 @@ async function main() {
     await seedCollections();
     console.log("→ Seeding content, coupons & blog");
     await seedContent(adminId);
-    console.log("→ Seeding demo customers, orders & reviews");
-    await seedCustomersAndOrders();
+    if (process.env.SEED_DEMO_CUSTOMERS === "false") {
+      console.log("→ SEED_DEMO_CUSTOMERS=false: skipping demo customers, orders & reviews");
+    } else {
+      console.log("→ Seeding demo customers, orders & reviews");
+      await seedCustomersAndOrders();
+    }
   }
   console.log("✓ Seed complete");
 }

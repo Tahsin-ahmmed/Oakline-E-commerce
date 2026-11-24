@@ -152,9 +152,9 @@ npm run db:studio      # browse data
 
 Prisma 7 reads its connection from [`prisma.config.ts`](prisma.config.ts) (which loads `.env`), not from `schema.prisma`.
 
-**Demo content** (skipped with `SEED_DEMO=false`): 10 categories with subcategories, 8 brands, 50 products (with colour/size variants, sale prices, featured items and some low/out-of-stock items), shipping zones for Dhaka / suburbs / rest of Bangladesh, 5 coupons (`WELCOME10`, `FLAT500`, `FREESHIP`, `HOME15`, and the expired `SUMMER20`), banners, homepage sections, collections, testimonials, 3 blog posts, 6 demo customers, 42 historical COD orders across ~4 months (so the dashboard charts have real data) and verified-purchase reviews.
+**Demo content** (skipped with `SEED_DEMO=false`): 10 categories with subcategories, 8 brands, 49 products (with colour/size variants, sale prices, featured items and some low/out-of-stock items), shipping zones for Dhaka / suburbs / rest of Bangladesh, 5 coupons (`WELCOME10`, `FLAT500`, `FREESHIP`, `HOME15`, and the expired `SUMMER20`), banners, homepage sections, collections, testimonials, 3 blog posts, 6 demo customers, 42 historical COD orders across ~4 months (so the dashboard charts have real data) and verified-purchase reviews.
 
-Demo customers (e.g. `ayesha@example.com`) use the password `Customer#2026`. They exist only when demo data is seeded — **never seed demo data in production** (`SEED_DEMO=false`).
+Demo customers (skip them with `SEED_DEMO_CUSTOMERS=false`; e.g. `ayesha@example.com`) use the password `Customer#2026`. They exist only when demo data is seeded — **never seed demo data in production** (`SEED_DEMO=false`).
 
 Product photos in the demo data are hot-linked from Unsplash (free to use). Replace them with your own via the admin (uploads go to Cloudinary).
 
