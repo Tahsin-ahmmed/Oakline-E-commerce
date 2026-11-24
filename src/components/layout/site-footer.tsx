@@ -114,8 +114,14 @@ export function SiteFooter({ settings, categories }: { settings: Settings; categ
       </div>
       <div className="border-t border-white/10">
         <div className="container-page flex flex-col items-center justify-between gap-4 py-6 text-xs text-primary-foreground/60 sm:flex-row">
-          <p>
+          <p className="text-center sm:text-left">
             © {year} {general.siteName}. All rights reserved.
+            <span className="mx-2 hidden sm:inline" aria-hidden>
+              ·
+            </span>
+            <span className="block sm:inline">
+              Developed by <span className="font-medium text-sand">Tahsin Ahmmed</span>
+            </span>
           </p>
           {socials.length > 0 && (
             <ul className="flex gap-5">
