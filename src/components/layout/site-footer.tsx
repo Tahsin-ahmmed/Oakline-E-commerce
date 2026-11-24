@@ -120,7 +120,16 @@ export function SiteFooter({ settings, categories }: { settings: Settings; categ
               ·
             </span>
             <span className="block sm:inline">
-              Developed by <span className="font-medium text-sand">Tahsin Ahmmed</span>
+              Developed by{" "}
+              <a
+                href="https://www.linkedin.com/in/taahsin-ahmmed/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-sand underline-offset-4 hover:underline"
+                aria-label="Tahsin Ahmmed on LinkedIn (opens in a new tab)"
+              >
+                Tahsin Ahmmed
+              </a>
             </span>
           </p>
           {socials.length > 0 && (
