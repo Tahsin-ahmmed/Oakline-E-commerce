@@ -5,6 +5,7 @@ import { listPaymentOptions } from "@/lib/payments/registry";
 import { getCartCount } from "@/services/cart";
 import { getSettings } from "@/services/settings";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
+import { PixelEvent } from "@/components/analytics/tracker";
 
 export const metadata: Metadata = { title: "Checkout", robots: { index: false } };
 
@@ -14,6 +15,7 @@ export default async function CheckoutPage() {
   const paymentOptions = listPaymentOptions({ codEnabled: settings.commerce.codEnabled });
   return (
     <div className="container-page py-10 lg:py-14">
+      <PixelEvent event="InitiateCheckout" params={{ num_items: count, currency: settings.general.currency }} />
       <p className="eyebrow">Secure checkout</p>
       <h1 className="mt-2 mb-8 font-heading text-4xl">Checkout</h1>
       <CheckoutForm

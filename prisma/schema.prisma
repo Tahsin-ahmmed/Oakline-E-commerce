@@ -991,3 +991,63 @@ model RateLimit {
   count   Int
   resetAt DateTime
 }
+
+// ───────────── Traffic analytics (first-party) ─────────────
+
+/// One visit. A new session starts after 30 minutes of inactivity or when the visitor arrives
+/// through a new campaign link. Attribution (source/channel/campaign) is fixed at session start.
+/// No IP addresses are stored.
+model AnalyticsSession {
+  id           String   @id @default(cuid())
+  /// Anonymous first-party visitor id (cookie), stable across sessions.
+  visitorId    String
+  userId       String?
+  startedAt    DateTime @default(now())
+  lastSeenAt   DateTime @default(now())
+  landingPath  String
+  referrerHost String?
+  /// Normalised source, e.g. facebook, instagram, google, chatgpt, direct.
+  source       String
+  /// Channel group, e.g. paid_social, organic_social, organic_search, ai, referral, email, direct.
+  channel      String
+  campaign     String?
+  utmSource    String?
+  utmMedium    String?
+  utmContent   String?
+  utmTerm      String?
+  /// Ad click identifier type that was present (fbclid, gclid, ttclid) — the id itself is not stored.
+  clickIdType  String?
+  country      String?
+  region       String?
+  city         String?
+  device       String
+  browser      String?
+  os           String?
+  pageViews    Int      @default(0)
+
+  events AnalyticsEvent[]
+
+  @@index([startedAt])
+  @@index([visitorId])
+  @@index([source, startedAt])
+  @@index([channel, startedAt])
+  @@index([campaign])
+  @@index([lastSeenAt])
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  sessionId String
+  /// page_view | add_to_cart | purchase
+  type      String
+  path      String?
+  productId String?
+  orderId   String?
+  value     Decimal? @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
+
+  session AnalyticsSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([type, createdAt])
+}

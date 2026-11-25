@@ -4,11 +4,17 @@ import { RATE_LIMITS } from "@/lib/rate-limit";
 import { pagination } from "@/lib/validations/common";
 import { checkoutSchema } from "@/lib/validations/checkout";
 import { placeOrder } from "@/services/checkout";
+import { trackServerEvent } from "@/services/analytics";
 
 /** POST /api/orders — place an order from the current cart. Prices, stock, coupon & shipping are recomputed server-side. */
 export const POST = route({ auth: "optional", rateLimit: RATE_LIMITS.checkout }, async ({ json, user }) => {
   const input = await json(checkoutSchema);
-  return placeOrder(input, user);
+  const result = await placeOrder(input, user);
+  if (!result.duplicate) {
+    const order = await prisma.order.findUnique({ where: { id: result.orderId }, select: { grandTotal: true } });
+    await trackServerEvent("purchase", { orderId: result.orderId, value: order?.grandTotal.toFixed(2) });
+  }
+  return result;
 });
 
 /** GET /api/orders — the signed-in customer's orders. */

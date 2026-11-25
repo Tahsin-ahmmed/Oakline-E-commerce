@@ -59,6 +59,19 @@ export const settingsSchemas = {
       .max(300)
       .default("First access to new drops, style notes and members-only offers. No spam, ever."),
   }),
+  tracking: z.object({
+    /** First-party visitor analytics (Admin → Traffic & sources). No IP addresses are stored. */
+    analyticsEnabled: z.boolean().default(true),
+    /** Don't count visits from signed-in staff accounts. */
+    excludeStaff: z.boolean().default(true),
+    /** Meta (Facebook) Pixel ID — enables PageView, ViewContent, AddToCart, InitiateCheckout and Purchase events. */
+    metaPixelId: z
+      .string()
+      .trim()
+      .regex(/^(\d{10,20})?$/, "A Meta Pixel ID is 10–20 digits")
+      .optional()
+      .default(""),
+  }),
   maintenance: z.object({
     enabled: z.boolean().default(false),
     message: z.string().trim().max(300).default("We're refreshing the shop and will be back shortly."),

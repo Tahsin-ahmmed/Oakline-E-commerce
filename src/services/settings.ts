@@ -22,13 +22,27 @@ async function loadSettings(): Promise<Settings> {
 
 const cachedSettings = unstable_cache(loadSettings, ["website-settings"], { tags: [SETTINGS_TAG], revalidate: 300 });
 
+/**
+ * Fill groups/fields missing from a cached copy (e.g. a settings group added in a newer release while an
+ * older cached value is still being served) so callers can always rely on the full Settings shape.
+ */
+function withDefaults(value: Partial<Settings> | null | undefined): Settings {
+  const defaults = defaultSettings();
+  const out = { ...defaults } as Record<string, unknown>;
+  for (const group of Object.keys(defaults) as SettingsGroup[]) {
+    const current = value?.[group];
+    if (current && typeof current === "object") out[group] = { ...defaults[group], ...current };
+  }
+  return out as Settings;
+}
+
 /** Store settings with defaults applied. Cached across requests and invalidated on update. */
 export const getSettings = cache(async (): Promise<Settings> => {
   try {
-    return await cachedSettings();
+    return withDefaults(await cachedSettings());
   } catch {
     // Outside a Next.js request context (scripts/tests) unstable_cache is unavailable.
-    return loadSettings();
+    return withDefaults(await loadSettings());
   }
 });
 

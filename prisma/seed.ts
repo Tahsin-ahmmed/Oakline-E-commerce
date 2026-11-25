@@ -643,6 +643,104 @@ async function seedCustomersAndOrders() {
   });
 }
 
+/** Demo visitor traffic for the Traffic & sources dashboard (demo data only — never seeded in production). */
+async function seedDemoTraffic() {
+  if (await prisma.analyticsSession.count()) return;
+  const products = await prisma.product.findMany({ select: { id: true, slug: true, effectivePrice: true } });
+  if (!products.length) return;
+  type Profile = {
+    weight: number;
+    source: string;
+    channel: string;
+    campaign?: string;
+    ads?: string[];
+    medium?: string;
+    referrer?: string;
+    clickIdType?: string;
+    conv: number; // purchase probability
+    atc: number; // add-to-cart probability
+    mobile: number;
+  };
+  const profiles: Profile[] = [
+    { weight: 22, source: "facebook", channel: "paid_social", campaign: "eid_sale_2026", ads: ["carousel_bags", "video_sunglasses", "single_image_shirts"], medium: "paid_social", referrer: "m.facebook.com", clickIdType: "fbclid", conv: 0.035, atc: 0.14, mobile: 0.92 },
+    { weight: 12, source: "facebook", channel: "paid_social", campaign: "winter_footwear", ads: ["boots_reel", "sneakers_carousel"], medium: "paid_social", referrer: "m.facebook.com", clickIdType: "fbclid", conv: 0.022, atc: 0.11, mobile: 0.9 },
+    { weight: 8, source: "instagram", channel: "paid_social", campaign: "eid_sale_2026", ads: ["story_handbags", "reel_new_drop"], medium: "paid_social", referrer: "l.instagram.com", clickIdType: "fbclid", conv: 0.028, atc: 0.13, mobile: 0.97 },
+    { weight: 10, source: "facebook", channel: "organic_social", referrer: "m.facebook.com", conv: 0.012, atc: 0.07, mobile: 0.9 },
+    { weight: 9, source: "instagram", channel: "organic_social", referrer: "l.instagram.com", conv: 0.015, atc: 0.08, mobile: 0.96 },
+    { weight: 13, source: "google", channel: "organic_search", referrer: "www.google.com", conv: 0.03, atc: 0.12, mobile: 0.7 },
+    { weight: 4, source: "chatgpt", channel: "ai", referrer: "chatgpt.com", conv: 0.045, atc: 0.16, mobile: 0.45 },
+    { weight: 2, source: "perplexity", channel: "ai", referrer: "www.perplexity.ai", conv: 0.03, atc: 0.12, mobile: 0.4 },
+    { weight: 5, source: "whatsapp", channel: "organic_social", referrer: "web.whatsapp.com", conv: 0.04, atc: 0.15, mobile: 0.85 },
+    { weight: 13, source: "direct", channel: "direct", conv: 0.038, atc: 0.13, mobile: 0.6 },
+    { weight: 2, source: "dhakafashionblog.com", channel: "referral", referrer: "dhakafashionblog.com", conv: 0.02, atc: 0.1, mobile: 0.55 },
+  ];
+  const totalWeight = profiles.reduce((s, p) => s + p.weight, 0);
+  const pickProfile = () => {
+    let r = rand() * totalWeight;
+    for (const p of profiles) if ((r -= p.weight) <= 0) return p;
+    return profiles[0];
+  };
+  const cities: [string, string][] = [["Dhaka", "C"], ["Dhaka", "C"], ["Dhaka", "C"], ["Chattogram", "B"], ["Sylhet", "G"], ["Rajshahi", "E"], ["Khulna", "D"], ["Gazipur", "C"], ["Narayanganj", "C"], ["Cumilla", "B"]];
+  const landings = ["/", "/", "/categories/women", "/categories/men", "/products?type=sunglasses", "/products?type=bags", "/collections/summer-essentials"];
+
+  for (let day = 59; day >= 0; day--) {
+    const trend = 1 + (59 - day) / 45; // traffic grows over time
+    const count = Math.round((25 + rand() * 20) * trend);
+    for (let k = 0; k < count; k++) {
+      const p = pickProfile();
+      const startedAt = new Date(Date.now() - day * 86_400_000 - Math.floor(rand() * 86_400_000));
+      const pages = rand() < 0.42 ? 1 : 2 + Math.floor(rand() * 7);
+      const mobile = rand() < p.mobile;
+      const [city, region] = pick(cities);
+      const ad = p.ads ? pick(p.ads) : null;
+      const landing = p.campaign ? pick(["/", "/categories/women", "/products?type=bags", "/products?type=sunglasses"]) : pick(landings);
+      const events: { type: string; path?: string; productId?: string; value?: string; createdAt: Date }[] = [];
+      const t = (i: number) => new Date(startedAt.getTime() + i * 45_000);
+      events.push({ type: "page_view", path: landing.split("?")[0], createdAt: t(0) });
+      for (let i = 1; i < pages; i++) {
+        const prod = pick(products);
+        events.push({ type: "page_view", path: rand() < 0.65 ? `/products/${prod.slug}` : pick(["/categories/men", "/categories/women", "/products", "/cart"]), createdAt: t(i) });
+      }
+      if (pages > 1 && rand() < p.atc * 2.2) {
+        const prod = pick(products);
+        events.push({ type: "add_to_cart", productId: prod.id, value: prod.effectivePrice.toFixed(2), createdAt: t(pages) });
+        if (rand() < (p.conv / p.atc) * 1.1) {
+          events.push({ type: "page_view", path: "/checkout", createdAt: t(pages + 1) });
+          const value = Number(prod.effectivePrice) * (1 + Math.floor(rand() * 2)) + 70;
+          events.push({ type: "purchase", value: value.toFixed(2), createdAt: t(pages + 3) });
+        } else if (rand() < 0.35) {
+          events.push({ type: "page_view", path: "/checkout", createdAt: t(pages + 1) });
+        }
+      }
+      const last = events[events.length - 1].createdAt;
+      await prisma.analyticsSession.create({
+        data: {
+          visitorId: `demo-${Math.floor(rand() * 2600)}`,
+          startedAt,
+          lastSeenAt: last,
+          landingPath: landing.split("?")[0],
+          referrerHost: p.referrer ?? null,
+          source: p.source,
+          channel: p.channel,
+          campaign: p.campaign ?? null,
+          utmSource: p.campaign ? p.source : null,
+          utmMedium: p.medium ?? null,
+          utmContent: ad,
+          clickIdType: p.clickIdType ?? null,
+          country: "BD",
+          region,
+          city,
+          device: mobile ? (rand() < 0.06 ? "tablet" : "mobile") : "desktop",
+          browser: p.source === "facebook" && mobile ? "Facebook app" : p.source === "instagram" && mobile ? "Instagram app" : mobile ? pick(["Chrome", "Chrome", "Samsung Internet", "Safari"]) : pick(["Chrome", "Chrome", "Edge", "Firefox", "Safari"]),
+          os: mobile ? pick(["Android", "Android", "Android", "iOS"]) : pick(["Windows", "Windows", "macOS"]),
+          pageViews: events.filter((e) => e.type === "page_view").length,
+          events: { create: events.map((e) => ({ type: e.type, path: e.path ?? null, productId: e.productId ?? null, value: e.value ?? null, createdAt: e.createdAt })) },
+        },
+      });
+    }
+  }
+}
+
 async function main() {
   console.log("→ Seeding roles & permissions");
   await seedRbac(prisma);
@@ -685,6 +783,8 @@ async function main() {
     } else {
       console.log("→ Seeding demo customers, orders & reviews");
       await seedCustomersAndOrders();
+      console.log("→ Seeding demo visitor traffic");
+      await seedDemoTraffic();
     }
   }
   console.log("✓ Seed complete");

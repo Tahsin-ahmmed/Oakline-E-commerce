@@ -30,7 +30,7 @@ export default async function PrivacyPolicyPage() {
                 <li><strong>Order details</strong> — delivery addresses, items purchased, order notes and payment status.</li>
                 <li><strong>Payment information</strong> — card payments are handled entirely by Stripe. We never receive or store your full card number.</li>
                 <li><strong>Communications</strong> — messages you send us and your newsletter preferences.</li>
-                <li><strong>Technical data</strong> — IP address, browser type and essential cookies used to keep you signed in and remember your bag.</li>
+                <li><strong>Technical data</strong> — browser and device type, approximate location, the page that referred you, and cookies used to keep you signed in, remember your bag and measure visits (see Cookies).</li>
               </ul>
             </>
           ),
@@ -52,11 +52,22 @@ export default async function PrivacyPolicyPage() {
           id: "cookies",
           title: "Cookies",
           body: (
-            <p>
-              We use a small number of essential, HTTP-only cookies: one to keep you signed in securely and one to remember your shopping bag if
-              you are browsing as a guest. We do not use third-party advertising cookies. Your recently viewed products are stored only in your own
-              browser.
-            </p>
+            <>
+              <p>
+                We use a small number of essential, HTTP-only cookies: one to keep you signed in securely and one to remember your shopping bag if
+                you are browsing as a guest. Your recently viewed products are stored only in your own browser.
+              </p>
+              <p>
+                We also use two first-party analytics cookies to understand how visitors find us (for example, from a search engine, social media
+                post or advertisement) and which pages they view. This tells us which marketing works. We record the referring website, campaign
+                tags in the link, device type and an approximate location (city) — we do not store your IP address, and this data is never sold.
+              </p>
+              <p>
+                If enabled, we use the Meta (Facebook) Pixel to measure the results of our Facebook and Instagram ads and to show relevant ads.
+                Meta may set its own cookies for this purpose, under Meta&apos;s privacy policy. You can manage ad preferences in your Facebook or
+                Instagram settings, and you can block or delete cookies in your browser at any time.
+              </p>
+            </>
           ),
         },
         {

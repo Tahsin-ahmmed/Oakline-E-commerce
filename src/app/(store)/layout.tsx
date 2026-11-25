@@ -9,6 +9,7 @@ import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { MaintenanceScreen } from "@/components/layout/maintenance-screen";
+import { AnalyticsTracker } from "@/components/analytics/tracker";
 
 export default async function StoreLayout({ children }: { children: React.ReactNode }) {
   const [settings, user, categories, cartCount] = await Promise.all([
@@ -43,6 +44,9 @@ export default async function StoreLayout({ children }: { children: React.ReactN
         </main>
         <SiteFooter settings={settings} categories={categories} />
         <CartDrawer />
+        {!(settings.tracking.excludeStaff && user?.isStaff) && (
+          <AnalyticsTracker enabled={settings.tracking.analyticsEnabled} metaPixelId={settings.tracking.metaPixelId || undefined} />
+        )}
       </CartUIProvider>
     </StoreProvider>
   );

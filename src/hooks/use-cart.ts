@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api, errorMessage } from "@/lib/api-client";
 import { useCartUI } from "@/components/cart/cart-ui-context";
+import { pixelTrack } from "@/components/analytics/tracker";
+import { useStore } from "@/components/shared/store-context";
 import type { CartView } from "@/services/cart";
 
 export type { CartView, CartLine } from "@/services/cart";
@@ -23,7 +25,10 @@ export function useCartCount(initial?: number) {
   });
 }
 
-function useCartMutation<TVars>(fn: (vars: TVars) => Promise<CartView>, opts: { successMessage?: string; openDrawer?: boolean } = {}) {
+function useCartMutation<TVars>(
+  fn: (vars: TVars) => Promise<CartView>,
+  opts: { successMessage?: string; openDrawer?: boolean; onDone?: (cart: CartView, vars: TVars) => void } = {},
+) {
   const qc = useQueryClient();
   const ui = useCartUI();
   return useMutation({
@@ -34,6 +39,9 @@ function useCartMutation<TVars>(fn: (vars: TVars) => Promise<CartView>, opts: { 
       if (opts.successMessage) toast.success(opts.successMessage);
       if (opts.openDrawer) ui.open();
     },
+    onSettled: (cart, error, vars) => {
+      if (cart && !error) opts.onDone?.(cart, vars as TVars);
+    },
     onError: (e) => {
       toast.error(errorMessage(e));
       void qc.invalidateQueries({ queryKey: CART_KEY });
@@ -42,9 +50,23 @@ function useCartMutation<TVars>(fn: (vars: TVars) => Promise<CartView>, opts: { 
 }
 
 export function useAddToCart(opts: { openDrawer?: boolean } = { openDrawer: true }) {
+  const { currency } = useStore();
   return useCartMutation(
     (vars: { productId: string; variantId?: string; quantity: number }) => api<CartView>("/api/cart", { method: "POST", body: vars }),
-    { openDrawer: opts.openDrawer, successMessage: opts.openDrawer ? undefined : "Added to your bag" },
+    {
+      openDrawer: opts.openDrawer,
+      successMessage: opts.openDrawer ? undefined : "Added to your bag",
+      onDone: (cart, vars) => {
+        const line = cart.items.find((l) => l.productId === vars.productId && (!vars.variantId || l.variantId === vars.variantId));
+        pixelTrack("AddToCart", {
+          content_ids: [vars.productId],
+          content_type: "product",
+          content_name: line?.name,
+          value: line ? Number(line.unitPrice) * vars.quantity : undefined,
+          currency,
+        });
+      },
+    },
   );
 }
 

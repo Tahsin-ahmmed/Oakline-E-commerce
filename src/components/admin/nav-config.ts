@@ -6,6 +6,7 @@ import {
   FolderTree,
   Image as ImageIcon,
   LayoutDashboard,
+  ChartNoAxesCombined,
   type LucideIcon,
   Mail,
   MessageSquareText,
@@ -36,7 +37,10 @@ export interface NavGroup {
 export const ADMIN_NAV: NavGroup[] = [
   {
     label: "Overview",
-    items: [{ label: "Dashboard", href: "/admin", icon: LayoutDashboard, permission: "dashboard.view" }],
+    items: [
+      { label: "Dashboard", href: "/admin", icon: LayoutDashboard, permission: "dashboard.view" },
+      { label: "Traffic & sources", href: "/admin/analytics", icon: ChartNoAxesCombined, permission: "dashboard.view" },
+    ],
   },
   {
     label: "Sales",
@@ -104,6 +108,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   settings: "Settings",
   staff: "Staff & roles",
   activity: "Activity log",
+  analytics: "Traffic & sources",
   new: "New",
   invoice: "Invoice",
 };

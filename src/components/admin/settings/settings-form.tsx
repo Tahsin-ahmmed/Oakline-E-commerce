@@ -122,6 +122,22 @@ const GROUPS: { key: SettingsGroup; title: string; description: string; fields: 
     ],
   },
   {
+    key: "tracking",
+    title: "Tracking & ads",
+    description: "Visitor analytics and the Meta (Facebook) Pixel for ad measurement and retargeting.",
+    fields: [
+      { name: "analyticsEnabled", label: "Record visitor analytics", type: "switch", hint: "Powers Admin → Traffic & sources. No IP addresses are stored." },
+      { name: "excludeStaff", label: "Exclude staff visits", type: "switch", hint: "Visits while signed in as staff aren't counted." },
+      {
+        name: "metaPixelId",
+        label: "Meta Pixel ID",
+        type: "text",
+        placeholder: "e.g. 123456789012345",
+        hint: "From Meta Events Manager → Data sources. Sends PageView, ViewContent, AddToCart, InitiateCheckout and Purchase events. Leave empty to disable.",
+      },
+    ],
+  },
+  {
     key: "maintenance",
     title: "Maintenance",
     description: "Temporarily close the storefront. Staff can still browse the store and use the admin.",

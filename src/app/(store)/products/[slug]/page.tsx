@@ -4,6 +4,7 @@ import { getProductBySlug, getRelatedProducts } from "@/services/catalog";
 import { getSettings } from "@/services/settings";
 import { sanitizeRichText, stripHtml } from "@/lib/sanitize";
 import { ProductView } from "@/components/products/product-view";
+import { PixelEvent } from "@/components/analytics/tracker";
 import { ProductReviews } from "@/components/products/product-reviews";
 import { RecentlyViewed } from "@/components/products/recently-viewed";
 import { ProductGrid } from "@/components/products/product-card";
@@ -88,6 +89,17 @@ export default async function ProductPage({ params }: Props) {
   return (
     <div className="container-page py-8">
       <JsonLd data={productLd} />
+      <PixelEvent
+        event="ViewContent"
+        params={{
+          content_ids: [product.id],
+          content_name: product.name,
+          content_type: "product",
+          content_category: product.category.name,
+          value: Number(product.salePrice ?? product.price),
+          currency: settings.general.currency,
+        }}
+      />
       <JsonLd data={breadcrumbJsonLd(crumbs, base)} />
       <Breadcrumbs items={crumbs} />
       <div className="mt-6">

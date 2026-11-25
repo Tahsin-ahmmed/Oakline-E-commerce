@@ -10,8 +10,14 @@ import { getStripe } from "@/lib/payments/stripe";
 import { PAYMENT_METHOD_LABELS } from "@/lib/order-status";
 import { getCustomerOrder, syncStripeCheckoutSession } from "@/services/orders";
 import { OrderDetailView, toOrderView } from "@/components/account/order-view";
+import { PixelEvent } from "@/components/analytics/tracker";
 
 export const metadata: Metadata = { title: "Thank you", robots: { index: false } };
+
+/** True when the order was placed within the given window (so revisiting an old link doesn't re-report a sale). */
+function placedWithin(placedAt: Date, ms: number) {
+  return Date.now() - placedAt.getTime() < ms;
+}
 
 export default async function CheckoutSuccessPage({
   searchParams,
@@ -23,7 +29,7 @@ export default async function CheckoutSuccessPage({
 
   let order = await prisma.order.findUnique({
     where: { orderNumber: orderNumber.toUpperCase() },
-    select: { id: true, orderNumber: true, userId: true, paymentMethod: true, paymentStatus: true, customerEmail: true },
+    select: { id: true, orderNumber: true, userId: true, paymentMethod: true, paymentStatus: true, customerEmail: true, grandTotal: true, currency: true, placedAt: true, items: { select: { productId: true, quantity: true } } },
   });
   if (!order) notFound();
 
@@ -35,7 +41,7 @@ export default async function CheckoutSuccessPage({
         await syncStripeCheckoutSession(session);
         order = await prisma.order.findUniqueOrThrow({
           where: { id: order.id },
-          select: { id: true, orderNumber: true, userId: true, paymentMethod: true, paymentStatus: true, customerEmail: true },
+          select: { id: true, orderNumber: true, userId: true, paymentMethod: true, paymentStatus: true, customerEmail: true, grandTotal: true, currency: true, placedAt: true, items: { select: { productId: true, quantity: true } } },
         });
       }
     } catch (error) {
@@ -47,8 +53,26 @@ export default async function CheckoutSuccessPage({
   const owned = user && order.userId === user.id ? await getCustomerOrder(order.id, user.id) : null;
   const awaitingPayment = order.paymentMethod !== "COD" && order.paymentStatus !== "PAID";
 
+  // Report the conversion to Meta once: COD orders on placement, online payments once paid. Old links don't re-fire.
+  const recent = placedWithin(order.placedAt, 6 * 60 * 60 * 1000);
+  const reportPurchase = recent && !awaitingPayment;
+
   return (
     <div className="container-page py-12 lg:py-16">
+      {reportPurchase && (
+        <PixelEvent
+          event="Purchase"
+          eventId={order.orderNumber}
+          onceKey={`purchase_${order.orderNumber}`}
+          params={{
+            value: Number(order.grandTotal),
+            currency: order.currency,
+            content_type: "product",
+            content_ids: order.items.map((i) => i.productId).filter(Boolean),
+            num_items: order.items.reduce((n, i) => n + i.quantity, 0),
+          }}
+        />
+      )}
       <div className="mx-auto mb-10 max-w-2xl text-center">
         {awaitingPayment ? <Clock className="mx-auto size-12 text-warning" /> : <CheckCircle2 className="mx-auto size-12 text-success" />}
         <h1 className="mt-4 font-heading text-4xl">{awaitingPayment ? "We're confirming your payment" : "Thank you for your order"}</h1>
